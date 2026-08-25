@@ -15,6 +15,7 @@ export default function useTransactions() {
     const transactions = useSelector((state: RootState) => state.transaction.transactions);
     const [search, setSearch] = useState("");
     const [filterType, setFilterType] = useState<"all" | "income" | "expense">("all");
+    const [sortBy, setSortBy] = useState< "latest" | "oldest" | "az" | "za" | "highest" | "lowest">("latest")
 
 
             // GET ITEM LOCALSTORAGE
@@ -47,6 +48,46 @@ export default function useTransactions() {
         })
     }, [transactions, search, filterType])
 
+            //SORTER
+    const sortedTransactions = useMemo(() => {
+        const sorted = [...filteredTransactions];
+
+        switch (sortBy) {
+            case "latest":
+                return sorted.sort((a,b) =>
+                    new Date(b.date).getTime() - new Date(a.date).getTime()
+                );
+
+            case "oldest":
+                return sorted.sort((a,b) => 
+                    new Date(a.date).getTime() - new Date(b.date).getTime()
+                );
+
+            case "az":
+                return sorted.sort((a,b) =>
+                    a.title.localeCompare(b.title)
+                );
+
+            case "za":
+                return sorted.sort((a,b) => 
+                    b.title.localeCompare(a.title)
+                );
+
+            case "highest":
+                return sorted.sort((a,b) => 
+                    b.amount - a.amount
+                );
+
+            case "lowest":
+                return sorted.sort((a,b) => 
+                    a.amount - b.amount
+                );
+
+            default: return sorted;
+
+        }
+    }, [filteredTransactions, sortBy])
+
 
             // DELETE
     const handleDelete = (id: number) => {
@@ -67,5 +108,6 @@ export default function useTransactions() {
         dispatch(setEditTransaction(transaction))
     }
 
-    return {transactions, filteredTransactions, search, setSearch, filterType, setFilterType, handleDelete, handleEdit,}
+    return {transactions, sortedTransactions, sortBy, setSortBy, search, 
+        setSearch, filterType, setFilterType, handleDelete, handleEdit,}
 }

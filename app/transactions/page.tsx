@@ -1,6 +1,7 @@
 "use client";
 
 import useTransactions from "@/hooks/useTransactions";
+import ExpenseChart from "@/components/common/ExpenseChart";
 
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import Container from "@/components/ui/Container";
@@ -11,8 +12,8 @@ import Input from "@/components/ui/Input";
 
 export default function TransactionsPage() {
 
-    const { transactions, filteredTransactions, search, setSearch, 
-    filterType, setFilterType, handleDelete, handleEdit,} 
+    const { transactions, sortedTransactions, search, setSearch, filterType, 
+        setFilterType, sortBy, setSortBy, handleDelete, handleEdit,} 
     = useTransactions();
 
     return (
@@ -32,6 +33,13 @@ export default function TransactionsPage() {
 
                     {/* Tampilan Amount */}
                     <SummaryCards />
+
+                    {/* Chart */}
+                    <div className="mb-8">
+                        <ExpenseChart
+                            transactions={transactions}
+                        />
+                    </div>
 
                     {/* SEARCH TRANSACTION */}
                     <div className="mb-6">
@@ -63,6 +71,37 @@ export default function TransactionsPage() {
                         </select>
                     </div>
 
+                    {/* SORTBY */}
+                    <div className="mb-6">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as 
+                                "latest"
+                                | "oldest"
+                                | "az"
+                                | "za"
+                                | "highest"
+                                | "lowest"
+                            )}
+
+                            className="
+                                w-full
+                                rounded-lg
+                                border
+                                border-gray-300
+                                px-4
+                                py-3
+                            "
+                        >
+                            <option value="latest">Latest</option>
+                            <option value="oldest">Oldest</option>
+                            <option value="az">A ~ Z</option>
+                            <option value="za">Z ~ A</option>
+                            <option value="highest">Highest Amount</option>
+                            <option value="lowest">Lowest Amount</option>
+                        </select>
+                    </div>
+
                     {/* Form Tambah Transaksi */}
                     <div className="mb-8">
                         <TransactionForm />
@@ -70,7 +109,7 @@ export default function TransactionsPage() {
 
                     {/* List Transaksi */}
                     <TransactionList
-                        transactions={filteredTransactions}
+                        transactions={sortedTransactions}
                         onEdit={(transaction) => handleEdit(transaction.id)}
                         onDelete={handleDelete}
                     />
